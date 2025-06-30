@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # Use the official linux-zen PKGBUILD
 git clone --depth 1 'https://gitlab.archlinux.org/archlinux/packaging/packages/linux-zen.git' build
 cd build
