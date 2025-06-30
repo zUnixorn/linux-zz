@@ -33,11 +33,11 @@ jobs:
       - name: Install dependencies
         run: sudo apt install -y makepkg
       - name: Prepare build
-        run: ./prepare_build_test.sh
+        run: ./prepare_build.sh
       - name: Build packages
         run: docker run -e EXPORT_PKG=true -e CHECKSUM_SRC=false -v "./build:/pkg" ghcr.io/zaggash/arch-makepkg:latest
       - name: Isolate packages
-        run: mkdir repo && mv ./build/*.pkg.tar.zst repo/
+        run: mkdir repo && mv ./build/*.pkg.tar.zst ./repo/
       - name: Add packages to repo
         uses: addnab/docker-run-action@v3
         with:
