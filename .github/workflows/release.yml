@@ -39,7 +39,8 @@ jobs:
       - name: Isolate packages
         run: mkdir repo && mv ./build/*.pkg.tar.zst repo/
       - name: Add packages to repo
-        run: cd repo && repo-add linux-zz.db.tar.zst *.pkg.tar.zst
+        run: repo-add linux-zz.db.tar.zst ./*.pkg.tar.zst
+        working-directory: ./repo
       - name: Release packages
         uses: ncipollo/release-action@v1.16.0
         with:
