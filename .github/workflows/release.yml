@@ -1,0 +1,48 @@
+on:
+  push:
+    branches: [master]
+    paths:
+      - '**.sh'
+      - '.github/workflows/**'
+  schedule:
+    - cron: "4 2 * * *"
+  workflow_dispatch: ~
+
+name: Release
+
+concurrency:
+  group: release
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+env:
+  RELEASE_NAME: experimental
+  FAILOVER_RELEASE_NAME: failover
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    environment: Release
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+      - name: Prepare build
+        run: ./prepare_build_test.sh
+      - name: Build packages
+        run: docker run -e EXPORT_PKG=1 -e SYNC_DATABASE=1 -v build:/pkg cachyos/docker-makepkg:latest
+      # - name: Release mainline
+      #   uses: ncipollo/release-action@v1.16.0
+      #   with:
+      #     name: ${{ env.RELEASE_NAME }}
+      #     tag: ${{ env.RELEASE_NAME }}
+      #     commit: ${{ github.sha }}
+      #     artifacts: ./repo/*
+      #     allowUpdates: true
+      #     artifactErrorsFailBuild: true
+      #     omitBody: true
+      #     omitBodyDuringUpdate: true
+      #     removeArtifacts: true
