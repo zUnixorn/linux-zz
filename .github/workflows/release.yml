@@ -19,7 +19,7 @@ permissions:
 
 env:
   RELEASE_NAME: experimental
-  FAILOVER_RELEASE_NAME: failover
+  PKGBUILD_SHA256SUM: "<placeholder>"
 
 jobs:
   release:
@@ -31,7 +31,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4.2.2
       - name: Install dependencies
-        run: sudo apt install -y makepkg
+        run: sudo apt install -y makepkg pacman-package-manager
       - name: Prepare build
         run: ./prepare_build_test.sh
       - name: Debug check build folder
