@@ -19,7 +19,7 @@ permissions:
 
 env:
   RELEASE_NAME: experimental
-  PKGBUILD_SHA256SUM: "<placeholder>"
+  PKGBUILD_SHA256SUM: "3bcb02105c58946eb0c717cd5d853bd13fca6815249b1ec9b6ce9796d09a7d7b"
 
 jobs:
   release:
@@ -34,26 +34,24 @@ jobs:
         run: sudo apt install -y makepkg pacman-package-manager
       - name: Prepare build
         run: ./prepare_build_test.sh
-      - name: Debug check build folder
-        run: ls ./build
       - name: Build packages
         run: docker run -e EXPORT_PKG=true -e CHECKSUM_SRC=false -v "./build:/pkg" ghcr.io/zaggash/arch-makepkg:latest
       - name: Debug check build folder again
         run: ls ./build
-      - name: Create artifact to test the package
-        uses: actions/upload-artifact@v4
+      # - name: Create artifact to test the package
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     path: ./build
+      #     overwrite: true
+      - name: Release packages
+        uses: ncipollo/release-action@v1.16.0
         with:
-          path: ./build
-          overwrite: true
-    # - name: Release mainline
-    #   uses: ncipollo/release-action@v1.16.0
-    #   with:
-    #     name: ${{ env.RELEASE_NAME }}
-    #     tag: ${{ env.RELEASE_NAME }}
-    #     commit: ${{ github.sha }}
-    #     artifacts: ./repo/*
-    #     allowUpdates: true
-    #     artifactErrorsFailBuild: true
-    #     omitBody: true
-    #     omitBodyDuringUpdate: true
-    #     removeArtifacts: true
+          name: ${{ env.RELEASE_NAME }}
+          tag: ${{ env.RELEASE_NAME }}
+          commit: ${{ github.sha }}
+          artifacts: ./build/*.tar.zst
+          allowUpdates: true
+          artifactErrorsFailBuild: true
+          omitBody: true
+          omitBodyDuringUpdate: true
+          removeArtifacts: true
