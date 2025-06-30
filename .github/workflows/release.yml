@@ -36,20 +36,17 @@ jobs:
         run: ./prepare_build_test.sh
       - name: Build packages
         run: docker run -e EXPORT_PKG=true -e CHECKSUM_SRC=false -v "./build:/pkg" ghcr.io/zaggash/arch-makepkg:latest
-      - name: Debug check build folder again
-        run: ls ./build
-      # - name: Create artifact to test the package
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     path: ./build
-      #     overwrite: true
+      - name: Isolate packages
+        run: mkdir repo && mv ./build/*.pkg.tar.zst repo/
+      - name: Add packages to repo
+        run: cd repo && repo-add linux-zz.db.tar.zst *.pkg.tar.zst
       - name: Release packages
         uses: ncipollo/release-action@v1.16.0
         with:
           name: ${{ env.RELEASE_NAME }}
           tag: ${{ env.RELEASE_NAME }}
           commit: ${{ github.sha }}
-          artifacts: ./build/*.tar.zst
+          artifacts: ./repo/*
           allowUpdates: true
           artifactErrorsFailBuild: true
           omitBody: true
