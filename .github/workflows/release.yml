@@ -33,15 +33,15 @@ jobs:
       - name: Prepare build
         run: ./prepare_build_test.sh
       - name: Debug check build folder
-        run: ls build
+        run: ls ./build
       - name: Build packages
-        run: docker run -e EXPORT_PKG=true -e CHECKSUM_SRC=false -v build:/pkg ghcr.io/zaggash/arch-makepkg:latest
+        run: docker run -e EXPORT_PKG=true -e CHECKSUM_SRC=false -v "./build:/pkg" ghcr.io/zaggash/arch-makepkg:latest
       - name: Debug check build folder again
-        run: ls build
+        run: ls ./build
       - name: Create artifact to test the package
         uses: actions/upload-artifact@v4
         with:
-          path: build
+          path: ./build
           overwrite: true
     # - name: Release mainline
     #   uses: ncipollo/release-action@v1.16.0
