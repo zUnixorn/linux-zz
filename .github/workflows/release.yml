@@ -38,8 +38,10 @@ jobs:
         run: docker run -e EXPORT_PKG=true -e CHECKSUM_SRC=false -v "./build:/pkg" ghcr.io/zaggash/arch-makepkg:latest
       - name: Isolate packages
         run: mkdir repo && mv ./build/*.pkg.tar.zst repo/
+      - name: Debug ls
+        run: ls -a ./repo
       - name: Add packages to repo
-        run: repo-add linux-zz.db.tar.zst ./*.pkg.tar.zst
+        run: find . -name '*.pkg.tar.zst' -type f -exec repo-add linux-zz.db.tar.zst {} ';'
         working-directory: ./repo
       - name: Release packages
         uses: ncipollo/release-action@v1.16.0
