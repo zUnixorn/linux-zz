@@ -38,8 +38,9 @@ jobs:
           image: docker.io/archlinux:latest
           options: -v ${{ github.workspace }}:/workspace
           run: |
+            pacman -S --noconfirm sudo
             cd /workspace/build
-            makepkg --printsrcinfo > .SRCINFO
+            sudo -u nobody makepkg --printsrcinfo > .SRCINFO
       - name: Build packages
         run: docker run -e EXPORT_PKG=true -e CHECKSUM_SRC=false -v "./build:/pkg" ghcr.io/zaggash/arch-makepkg:latest
       - name: Isolate packages
