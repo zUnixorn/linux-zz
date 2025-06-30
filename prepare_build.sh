@@ -14,7 +14,7 @@ pkgbuild_checksum=$(sed -z \
 	-e "s/b2sums=([a-zA-Z0-9'\n\t ]*)\n*//" \
 	PKGBUILD | sha256sum | cut -d " " -f 1)
 
-echo "Comparing PKGBUILD hash: ${pkgbuild_checksum}"
+echo "Comparing with PKGBUILD hash: ${pkgbuild_checksum}"
 
 if [ "${PKGBUILD_SHA256SUM}" != "${pkgbuild_checksum}" ]; then
 	echo "Error: hash did not match"
@@ -34,4 +34,3 @@ sed -i \
 # Update .SRCINFO
 makepkg --printsrcinfo > .SRCINFO
 
-# TODO do actual build
