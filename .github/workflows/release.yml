@@ -28,10 +28,11 @@ jobs:
     environment: Release
 
     steps:
-      - name: Free Disk Space (Ubuntu)
+      - name: Free up more disk space
         uses: jlumbroso/free-disk-space@main
         with:
           tool-cache: true
+          docker-images: false
       - name: Checkout code
         uses: actions/checkout@v4.2.2
       - name: Prepare build
