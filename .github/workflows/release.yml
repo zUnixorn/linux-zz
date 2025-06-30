@@ -39,8 +39,10 @@ jobs:
           options: -v ${{ github.workspace }}:/workspace
           run: |
             pacman -Syu --noconfirm sudo
-            cd /workspace/build
-            sudo -u nobody makepkg --printsrcinfo | dd of=./.SRCINFO
+            cp -r /workspace/build /build
+            chown -R nobody:nobody /build
+            cd /build
+            sudo -u nobody makepkg --printsrcinfo | dd of=/workspace/build/.SRCINFO
       - name: Build packages
         run: docker run -e EXPORT_PKG=true -e CHECKSUM_SRC=false -v "./build:/pkg" ghcr.io/zaggash/arch-makepkg:latest
       - name: Isolate packages
