@@ -14,7 +14,12 @@ pkgbuild_checksum=$(sed -z \
 	-e "s/b2sums=([a-zA-Z0-9'\n\t ]*)\n*//" \
 	PKGBUILD | sha256sum | cut -d " " -f 1)
 
-# TODO fail if it does not match the previous checksum
+echo "Comparing PKGBUILD hash: ${pkgbuild_checksum}"
+
+if [ "${PKGBUILD_SHA256SUM}" != "${pkgbuild_checksum}" ]; then
+	echo "Error: hash did not match"
+	exit 1
+fi
 
 # Modify the PKGBUILD to include ZFS
 sed -i \
