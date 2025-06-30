@@ -30,10 +30,16 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.2.2
-      - name: Install dependencies
-        run: sudo apt install -y makepkg
       - name: Prepare build
         run: ./prepare_build.sh
+      - name: Generate .SRCINFO
+        uses: addnab/docker-run-action@v3
+        with:
+          image: docker.io/archlinux:latest
+          options: -v ${{ github.workspace }}:/workspace
+          run: |
+            cd /workspace/build
+            makepkg --printsrcinfo > .SRCINFO
       - name: Build packages
         run: docker run -e EXPORT_PKG=true -e CHECKSUM_SRC=false -v "./build:/pkg" ghcr.io/zaggash/arch-makepkg:latest
       - name: Isolate packages
