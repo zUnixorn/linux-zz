@@ -40,7 +40,7 @@ jobs:
           run: |
             pacman -Syu --noconfirm sudo
             cd /workspace/build
-            sudo -u nobody makepkg --printsrcinfo > .SRCINFO
+            sudo -u nobody makepkg --printsrcinfo | dd of=./.SRCINFO
       - name: Build packages
         run: docker run -e EXPORT_PKG=true -e CHECKSUM_SRC=false -v "./build:/pkg" ghcr.io/zaggash/arch-makepkg:latest
       - name: Isolate packages
