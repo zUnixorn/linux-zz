@@ -38,7 +38,7 @@ jobs:
           image: docker.io/archlinux:latest
           options: -v ${{ github.workspace }}:/workspace
           run: |
-            pacman -S --noconfirm sudo
+            pacman -Syu --noconfirm sudo
             cd /workspace/build
             sudo -u nobody makepkg --printsrcinfo > .SRCINFO
       - name: Build packages
