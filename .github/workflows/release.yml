@@ -31,18 +31,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4.2.2
       - name: Install dependencies
-        run: sudo apt install -y makepkg pacman-package-manager
+        run: sudo apt install -y makepkg
       - name: Prepare build
         run: ./prepare_build_test.sh
       - name: Build packages
         run: docker run -e EXPORT_PKG=true -e CHECKSUM_SRC=false -v "./build:/pkg" ghcr.io/zaggash/arch-makepkg:latest
       - name: Isolate packages
         run: mkdir repo && mv ./build/*.pkg.tar.zst repo/
-      - name: Debug ls
-        run: ls -a ./repo
       - name: Add packages to repo
-        run: find . -name '*.pkg.tar.zst' -type f -exec repo-add linux-zz.db.tar.zst {} ';'
-        working-directory: ./repo
+        uses: addnab/docker-run-action@v3
+        with:
+          image: docker.io/archlinux:latest
+          options: -v ./repo:/repo
+          run: |
+            cd /repo
+            repo-add linux-zz.db.tar.zst *.pkg.tar.zst
       - name: Release packages
         uses: ncipollo/release-action@v1.16.0
         with:
