@@ -36,7 +36,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4.2.2
       - name: Prepare build
-        run: ./prepare_build_test.sh
+        run: ./prepare_build.sh
       - name: Generate .SRCINFO
         uses: addnab/docker-run-action@v3
         with:
