@@ -28,6 +28,6 @@ sed -i \
     -e "s/license=(GPL-2.0-only)/license=(GPL-2.0-only LicenseRef-CDDL)/" \
     -e "1s/^/_zfsver=2.3.3\n/" \
     -e '$a\\nsource+=("https://github.com/openzfs/zfs/releases/download/zfs-${_zfsver}/zfs-${_zfsver}.tar.gz")\nsha256sums+=("SKIP")\nb2sums+=("SKIP")\n' \
-    -e 's/\(echo "Prepared $pkgbase version $(<version)"\)/\1\n\n  echo "Adding ZFS to tree..."; make prepare; cd ${srcdir}\/zfs-${_zfsver}; .\/autogen.sh; .\/configure CC=gcc --prefix=\/usr --sysconfdir=\/etc --sbindir=\/usr\/bin --libdir=\/usr\/lib --datadir=\/usr\/share --includedir=\/usr\/include --with-udevdir=\/lib\/udev --libexecdir=\/usr\/lib\/zfs --with-config=kernel --enable-linux-builtin=yes --with-linux=${srcdir}\/${_srcname} --with-linux-obj=${srcdir}\/${_srcname}; .\/copy-builtin ${srcdir}\/${_srcname}; cd ${srcdir}\/${_srcname}; .\/scripts\/config -e ZFS/' \
+    -e 's/\(make -s kernelrelease > version\)/echo "Adding ZFS to tree..."; make prepare; cd ${srcdir}\/zfs-${_zfsver}; .\/autogen.sh; .\/configure CC=gcc --prefix=\/usr --sysconfdir=\/etc --sbindir=\/usr\/bin --libdir=\/usr\/lib --datadir=\/usr\/share --includedir=\/usr\/include --with-udevdir=\/lib\/udev --libexecdir=\/usr\/lib\/zfs --with-config=kernel --enable-linux-builtin=yes --with-linux=${srcdir}\/${_srcname} --with-linux-obj=${srcdir}\/${_srcname}; .\/copy-builtin ${srcdir}\/${_srcname}; cd ${srcdir}\/${_srcname}; .\/scripts\/config -e ZFS\n\n  \1/' \
     PKGBUILD
 
