@@ -32,17 +32,26 @@ jobs:
         uses: actions/checkout@v4.2.2
       - name: Prepare build
         run: ./prepare_build_test.sh
+      - name: Debug check build folder
+        run: ls build
       - name: Build packages
-        run: docker run -e EXPORT_PKG=1 -e SYNC_DATABASE=1 -v build:/pkg cachyos/docker-makepkg:latest
-      # - name: Release mainline
-      #   uses: ncipollo/release-action@v1.16.0
-      #   with:
-      #     name: ${{ env.RELEASE_NAME }}
-      #     tag: ${{ env.RELEASE_NAME }}
-      #     commit: ${{ github.sha }}
-      #     artifacts: ./repo/*
-      #     allowUpdates: true
-      #     artifactErrorsFailBuild: true
-      #     omitBody: true
-      #     omitBodyDuringUpdate: true
-      #     removeArtifacts: true
+        run: docker run -e EXPORT_PKG=true -e CHECKSUM_SRC=false -v build:/pkg ghcr.io/zaggash/arch-makepkg:latest
+      - name: Debug check build folder again
+        run: ls build
+      - name: Create artifact to test the package
+        uses: actions/upload-artifact@v4
+        with:
+          path: build
+          overwrite: true
+    # - name: Release mainline
+    #   uses: ncipollo/release-action@v1.16.0
+    #   with:
+    #     name: ${{ env.RELEASE_NAME }}
+    #     tag: ${{ env.RELEASE_NAME }}
+    #     commit: ${{ github.sha }}
+    #     artifacts: ./repo/*
+    #     allowUpdates: true
+    #     artifactErrorsFailBuild: true
+    #     omitBody: true
+    #     omitBodyDuringUpdate: true
+    #     removeArtifacts: true
