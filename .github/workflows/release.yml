@@ -36,7 +36,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4.2.2
       - name: Prepare build
-        run: ./prepare_build.sh
+        run: ./prepare_build_test.sh
       - name: Generate .SRCINFO
         uses: addnab/docker-run-action@v3
         with:
@@ -58,8 +58,11 @@ jobs:
           image: docker.io/archlinux:latest
           options: -v ${{ github.workspace }}:/workspace
           run: |
+            pacman -Syu --noconfirm gnupg
+            echo -n "${{ secrets.GPG_SIGNING_KEY }}" | gpg --import
             cd /workspace/repo
-            repo-add linux-zz.db.tar.zst *.pkg.tar.zst
+            find . -type f -iname '*.pkg.tar.zst' -not -iname '*.sig' -print -exec gpg --batch --yes --detach-sign --use-agent -u "${{ vars.GPG_KEY_ID }}" {} \;
+            find . -type f -iname '*.pkg.tar.zst' -not -iname '*.sig' -print0 | xargs -0 repo-add -k "${{ vars.GPG_KEY_ID }}" -s -v linux-zz.db.tar.zst
       - name: Release packages
         uses: ncipollo/release-action@v1.16.0
         with:
