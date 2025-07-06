@@ -45,7 +45,7 @@ jobs:
           GPG_SIGNING_KEY: "${{ secrets.GPG_SIGNING_KEY_B64 }}"
         run: docker run -e GPG_SIGNING_KEY -e GPG_KEY_ID -e PKGBUILD_SHA256SUM --rm -v "$(pwd)/output:/output" linux-zz-builder:latest
       - name: Add public key to release
-        run: echo -n "${{ vars.GPG_PUBLIC_KEY }}" > /output/public.pgp
+        run: echo -n "${{ vars.GPG_PUBLIC_KEY }}" > ./output/public.pgp
       - name: Release packages
         uses: ncipollo/release-action@v1.16.0
         with:
