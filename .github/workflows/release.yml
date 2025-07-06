@@ -35,8 +35,8 @@ jobs:
       #     docker-images: false
       - name: Checkout code
         uses: actions/checkout@v4.2.2
-          with:
-            ref: docker-container
+        with:
+          ref: docker-container
       - name: Build build container
         run: docker build -t linux-zz-builder Containerfile
       - name: Create output directory
