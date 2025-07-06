@@ -2,9 +2,10 @@
 
 set -e
 
+cd /build
+
 # Use the official linux-zen PKGBUILD
-git clone --depth 1 'https://gitlab.archlinux.org/archlinux/packaging/packages/linux-zen.git' build
-cd build
+git clone --depth 1 'https://gitlab.archlinux.org/archlinux/packaging/packages/linux-zen.git' .
 gpg --import keys/pgp/*.asc
 
 # Check if the kernel version is supported
@@ -47,4 +48,7 @@ sed -i \
     -e 's/\(_package[a-zA-Z0-9\-]*() *{\)/\1\n  install -Dm644 ${srcdir}\/${_zfsver}\/LICENSE "${pkgdir}\/usr\/share\/licenses\/${pkgname}\/CDDL"/' \
     -e 's/\(make -s kernelrelease > version\)/echo "Adding ZFS to tree..."; make prepare; cd ${srcdir}\/${_zfsver}; .\/autogen.sh; .\/configure CC=gcc --prefix=\/usr --sysconfdir=\/etc --sbindir=\/usr\/bin --libdir=\/usr\/lib --datadir=\/usr\/share --includedir=\/usr\/include --with-udevdir=\/lib\/udev --libexecdir=\/usr\/lib\/zfs --with-config=kernel --enable-linux-builtin=yes --with-linux=${srcdir}\/${_srcname} --with-linux-obj=${srcdir}\/${_srcname}; .\/copy-builtin ${srcdir}\/${_srcname}; cd ${srcdir}\/${_srcname}; .\/scripts\/config -e ZFS\n\n  \1/' \
     PKGBUILD
+
+makepkg --printsrcinfo > .SRCINFO
+# TODO `makepkg -g` could be used to generate checksums here
 

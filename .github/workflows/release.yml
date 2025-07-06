@@ -18,7 +18,7 @@ permissions:
   contents: write
 
 env:
-  RELEASE_NAME: experimental
+  RELEASE_NAME: experimental-docker
   PKGBUILD_SHA256SUM: "3bcb02105c58946eb0c717cd5d853bd13fca6815249b1ec9b6ce9796d09a7d7b"
 
 jobs:
@@ -35,41 +35,22 @@ jobs:
           docker-images: false
       - name: Checkout code
         uses: actions/checkout@v4.2.2
-      - name: Prepare build
-        run: ./prepare_build.sh
-      - name: Generate .SRCINFO
-        uses: addnab/docker-run-action@v3
-        with:
-          image: docker.io/archlinux:latest
-          options: -v ${{ github.workspace }}:/workspace
-          run: |
-            pacman -Syu --noconfirm sudo
-            cp -r /workspace/build /build
-            chown -R nobody:nobody /build
-            cd /build
-            sudo -u nobody makepkg --printsrcinfo | dd of=/workspace/build/.SRCINFO
-      - name: Build packages
-        run: docker run -e EXPORT_PKG=true -e CHECKSUM_SRC=false -v "./build:/pkg" ghcr.io/zaggash/arch-makepkg:latest
-      - name: Isolate packages
-        run: mkdir repo && mv ./build/*.pkg.tar.zst ./repo/
-      - name: Add packages to repo
-        uses: addnab/docker-run-action@v3
-        with:
-          image: docker.io/archlinux:latest
-          options: -v ${{ github.workspace }}:/workspace
-          run: |
-            pacman -Syu --noconfirm gnupg
-            echo -n "${{ secrets.GPG_SIGNING_KEY }}" | gpg --import
-            cd /workspace/repo
-            find . -type f -iname '*.pkg.tar.zst' -not -iname '*.sig' -print -exec gpg --batch --yes --detach-sign --use-agent -u "${{ vars.GPG_KEY_ID }}" {} \;
-            find . -type f -iname '*.pkg.tar.zst' -not -iname '*.sig' -print0 | xargs -0 repo-add -k "${{ vars.GPG_KEY_ID }}" -s -v linux-zz.db.tar.zst
+      - name: Build build container
+        run: docker build -t linux-zz-builder Containerfile
+      - name: Create output directory
+        run: mkdir ./output
+      - name: Build kernel
+        env:
+          GPG_KEY_ID: "${{ vars.GPG_KEY_ID }}"
+          GPG_SIGNING_KEY: "${{ secrets.GPG_SIGNING_KEY_B64 }}"
+        run: docker run -e GPG_SIGNING_KEY -e GPG_KEY_ID -e PKGBUILD_SHA256SUM --rm -v "$(pwd)/output:/output" linux-zz-builder:latest
       - name: Release packages
         uses: ncipollo/release-action@v1.16.0
         with:
           name: ${{ env.RELEASE_NAME }}
           tag: ${{ env.RELEASE_NAME }}
           commit: ${{ github.sha }}
-          artifacts: ./repo/*
+          artifacts: ./output/*
           allowUpdates: true
           artifactErrorsFailBuild: true
           omitBody: true
