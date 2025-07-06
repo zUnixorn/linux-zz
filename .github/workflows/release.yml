@@ -35,10 +35,8 @@ jobs:
       #     docker-images: false
       - name: Checkout code
         uses: actions/checkout@v4.2.2
-        with:
-          ref: docker-container
       - name: Build build container
-        run: docker build -t linux-zz-builder Containerfile
+        run: docker build -t linux-zz-builder -f Containerfile
       - name: Create output directory
         run: mkdir ./output
       - name: Build kernel
