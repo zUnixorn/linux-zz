@@ -28,13 +28,15 @@ jobs:
     environment: Release
 
     steps:
-      - name: Free up more disk space
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: true
-          docker-images: false
+      # - name: Free up more disk space
+      #   uses: jlumbroso/free-disk-space@main
+      #   with:
+      #     tool-cache: true
+      #     docker-images: false
       - name: Checkout code
         uses: actions/checkout@v4.2.2
+          with:
+            ref: docker-container
       - name: Build build container
         run: docker build -t linux-zz-builder Containerfile
       - name: Create output directory
@@ -44,6 +46,8 @@ jobs:
           GPG_KEY_ID: "${{ vars.GPG_KEY_ID }}"
           GPG_SIGNING_KEY: "${{ secrets.GPG_SIGNING_KEY_B64 }}"
         run: docker run -e GPG_SIGNING_KEY -e GPG_KEY_ID -e PKGBUILD_SHA256SUM --rm -v "$(pwd)/output:/output" linux-zz-builder:latest
+      - name: Add public key to release
+        run: echo -n "${{ vars.GPG_PUBLIC_KEY }}" > /output/public.pgp
       - name: Release packages
         uses: ncipollo/release-action@v1.16.0
         with:
