@@ -5,7 +5,7 @@ on:
       - '**.sh'
       - '.github/workflows/**'
   schedule:
-    - cron: "4 2 * * *"
+    # - cron: "4 2 * * *"
   workflow_dispatch: ~
 
 name: Release
