@@ -63,6 +63,8 @@ jobs:
             cd /workspace/repo
             find . -type f -iname '*.pkg.tar.zst' -not -iname '*.sig' -print -exec gpg --batch --yes --detach-sign --use-agent -u "${{ vars.GPG_KEY_ID }}" {} \;
             find . -type f -iname '*.pkg.tar.zst' -not -iname '*.sig' -print0 | xargs -0 repo-add -k "${{ vars.GPG_KEY_ID }}" -s -v linux-zz.db.tar.zst
+      - name: Add public key to release
+        run: echo -n "${{ vars.GPG_PUBLIC_KEY }}" > ./output/public.pgp
       - name: Release packages
         uses: ncipollo/release-action@v1.16.0
         with:
