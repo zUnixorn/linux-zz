@@ -1,5 +1,4 @@
 # TODOs
-* generate checksums
 * check if it makes sense to have the package 'provide' zfs
 
 # Credits

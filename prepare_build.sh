@@ -37,13 +37,17 @@ if [ "${PKGBUILD_SHA256SUM}" != "${pkgbuild_checksum}" ]; then
 	exit 1
 fi
 
+# Get ZFS checksum
+curl -JLO "https://github.com/openzfs/zfs/releases/download/${zfs_tag}/${zfs_tag}.sha256.asc"
+zfs_checksum="$(gpg --decrypt ${zfs_tag}.sha256.asc 2> /dev/null | cut -d' ' -f1)"
+
 # Modify the PKGBUILD to include ZFS
 sed -i \
     -e "s/pkgbase=linux-zen/pkgbase=linux-zz/" \
     -e "s/pkgdesc='Linux ZEN'/pkgdesc='Linux ZEN with ZFS'/" \
     -e "s/license=(GPL-2.0-only)/license=(GPL-2.0-only custom:CDDL)/" \
     -e "1s/^/_zfsver=${zfs_tag}\n/" \
-    -e '$a\\nsource+=("https://github.com/openzfs/zfs/releases/download/${_zfsver}/${_zfsver}.tar.gz")\nsha256sums+=("SKIP")\nb2sums+=("SKIP")\n' \
+    -e '$a\\nsource+=("https://github.com/openzfs/zfs/releases/download/${_zfsver}/${_zfsver}.tar.gz")\nsha256sums+=('"'""${zfs_checksum}""'"')\nb2sums+=("SKIP")\n' \
     -e 's/\(_package[a-zA-Z0-9\-]*() *{\)/\1\n  install -Dm644 ${srcdir}\/${_zfsver}\/LICENSE "${pkgdir}\/usr\/share\/licenses\/${pkgname}\/CDDL"/' \
     -e 's/\(make -s kernelrelease > version\)/echo "Adding ZFS to tree..."; make prepare; cd ${srcdir}\/${_zfsver}; .\/autogen.sh; .\/configure CC=gcc --prefix=\/usr --sysconfdir=\/etc --sbindir=\/usr\/bin --libdir=\/usr\/lib --datadir=\/usr\/share --includedir=\/usr\/include --with-udevdir=\/lib\/udev --libexecdir=\/usr\/lib\/zfs --with-config=kernel --enable-linux-builtin=yes --with-linux=${srcdir}\/${_srcname} --with-linux-obj=${srcdir}\/${_srcname}; .\/copy-builtin ${srcdir}\/${_srcname}; cd ${srcdir}\/${_srcname}; .\/scripts\/config -e ZFS\n\n  \1/' \
     PKGBUILD
