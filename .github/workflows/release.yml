@@ -4,8 +4,6 @@ on:
     paths:
       - '**.sh'
       - '.github/workflows/**'
-  schedule:
-    - cron: "4 2 * * *"
   workflow_dispatch: ~
 
 name: Release
